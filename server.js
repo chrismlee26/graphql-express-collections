@@ -7,11 +7,13 @@ const { buildSchema } = require('graphql')
 const schema = buildSchema(`
 type Query {
   getAbout: About
-  getMeal(time: MealTime!): Meal
+  getMeal(time: MealType!): Meal
   getPet(id: Int!): Pet
   allPets: [Pet!]!
   getBike(id: Int!): Bike
   allBikes: [Bike!]!
+  getTime: [Time!]!
+  getRandom(range: Int!): Random
 }
 
 type About {
@@ -22,10 +24,23 @@ type Meal {
   description: String!
 }
 
-enum MealTime {
+enum MealType {
   breakfast
   lunch 
   dinner
+}
+
+enum DietType {
+  ominvore
+  paleo
+  vegitarian
+  vegan
+  insectivore
+}
+
+type Recipe {
+  mealType: MealType!
+  dietType: DietType!
 }
 
 type Pet {
@@ -36,10 +51,20 @@ type Pet {
 type Bike {
   year: String!
   build: String!
-  Model: String!
+  model: String!
   cc: Float!
+  hp: Float!
 }
 
+type Time {
+  hour: Int!
+  minute: Int!
+  second: Int!
+}
+
+type Random {
+  range: Int!
+}
 `)
 
 // Resolvers
@@ -63,25 +88,29 @@ const root = {
   },
   allBikes: () => {
     return BikesList
-  }
-
-
+  },
+  getTime: () => {
+    return { hours, minutes, seconds }
+  },
+  getRandom: ({ range }) => {
+    return Math.floor(Math.random() * range)
+  },
 }
 
 const petList = [
   { name: 'Fluffy', species: 'Dog' },
   { name: 'Sassy', species: 'Cat' },
-  { name: 'Goldberg', species: 'Frog' }
+  { name: 'Goldberg', species: 'Frog' },
 ]
 
 const bikesList = [
-  { year: '2019', build: 'Aprilia', model: 'RSV4RF-LE', cc: '999.6' },
-  { year: '2019', build: 'Honda', model: 'CRF250L', cc: '249.6' },
-  { year: '2008', build: 'Yamaha', model: 'R6', cc: '599' },
-  { year: '2007', build: 'Ducati', model: 'SportClassic LE', cc: '992' },
-  { year: '1998', build: 'Suzuki', model: 'RM250', cc: '249' },
-  { year: '1979', build: 'Honda', model: 'CB750K', cc: '748' },
-  { year: '1972', build: 'Yamaha', model: 'GT80', cc: '72' },
+  { year: '2019', build: 'Aprilia', model: 'RSV4RF-LE', cc: '999.6', hp: '201' },
+  { year: '2019', build: 'Honda', model: 'CRF250L', cc: '249.6', hp: '22.8' },
+  { year: '2008', build: 'Yamaha', model: 'R6', cc: '599', hp: '118' },
+  { year: '2007', build: 'Ducati', model: 'SportClassic LE', cc: '992', hp: '96' },
+  { year: '1998', build: 'Suzuki', model: 'RM250', cc: '249', hp: '40' },
+  { year: '1979', build: 'Honda', model: 'CB750K', cc: '748', hp: '76' },
+  { year: '1972', build: 'Yamaha', model: 'GT80', cc: '72', hp: '3.9' },
 ]
 
 // Create Express App
